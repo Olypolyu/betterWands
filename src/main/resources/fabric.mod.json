@@ -1,11 +1,11 @@
 {
 	"schemaVersion": 1,
-	"id": "examplemod",
+	"id": "betterwands",
 	"version": "${version}",
-	"name": "Example Mod",
-	"description": "This mod aims to help new BTA modders.",
+	"name": "Better Wands",
+	"description": "Improves the summoning wand and co.",
 	"authors": [
-		"Turnip Labs"
+		"Olypolyu"
 	],
 	"contact": {
 		"homepage": "",
@@ -16,16 +16,16 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"turniplabs.examplemod.ExampleMod"
+			"com.github.olypolyu.betterwands.BetterWands"
 		],
 		"beforeGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"com.github.olypolyu.betterwands.BetterWands"
 		],
 		"afterGameStart": [
-			"turniplabs.examplemod.ExampleMod"
+			"com.github.olypolyu.betterwands.BetterWands"
 		],
 		"recipesReady": [
-			"turniplabs.examplemod.ExampleMod"
+			"com.github.olypolyu.betterwands.BetterWands"
 		]
 	},
 	"mixins": [

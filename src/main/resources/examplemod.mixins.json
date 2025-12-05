@@ -1,10 +1,12 @@
 {
   "required": true,
-  "package": "turniplabs.examplemod.mixin",
+  "package": "com.github.olypolyu.betterwands.mixin",
   "compatibilityLevel": "JAVA_${java}",
   "injectors": {
     "defaultRequire": 1
   },
-  "mixins": [],
+  "mixins": [
+    "summoningWandMixin"
+  ],
   "client": []
 }
