@@ -1,29 +1,13 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage", "PropertyName")
 
 import org.apache.tools.ant.taskdefs.condition.Os
-import kotlin.reflect.KProperty
-import kotlin.text.replace
 
 plugins {
     id("fabric-loom")
     java
 }
 
-class CamelCaseConverter {
-	operator fun <T> getValue(ref: Any?, property: KProperty<*>): T {
-		val camelCase: String = property.name
-			.replace(Regex("[A-Z]")) { "_" + it.value.lowercase() }
-
-		providers.gradleProperty(camelCase)
-
-		@Suppress("UNCHECKED_CAST")
-		return project.property(camelCase) as T
-	}
-}
-
-val projectCamel = CamelCaseConverter();
-
-val lwjglVersion: String by projectCamel
+val lwjglVersion = providers.gradleProperty("lwjgl_version")
 val lwjglNatives = when {
     Os.isFamily(Os.FAMILY_UNIX) && !Os.isFamily(Os.FAMILY_MAC) -> "natives-linux"
     Os.isFamily(Os.FAMILY_WINDOWS) -> "natives-windows"
@@ -31,31 +15,34 @@ val lwjglNatives = when {
     else -> error("Unsupported OS")
 }
 
-val version: String by projectCamel
-val group: String by projectCamel
-val modName: String by projectCamel
-base.archivesName = modName
+val modVersion = providers.gradleProperty("mod_version")
+val modGroup = providers.gradleProperty("mod_group")
+val modName = providers.gradleProperty("mod_name")
 
-val btaChannel: String by projectCamel
-val btaVersion: String by projectCamel
+val btaChannel = providers.gradleProperty("bta_channel")
+val btaVersion = providers.gradleProperty("bta_version")
 
-val loaderVersion: String by projectCamel
-val legacyLwjglVersion: String by projectCamel
+val loaderVersion = providers.gradleProperty("loader_version")
+val legacyLwjglVersion = providers.gradleProperty("legacy_lwjgl_version")
 
-val halplibeVersion: String by projectCamel
-val modMenuVersion: String by projectCamel
+val halplibeVersion = providers.gradleProperty("halplibe_version")
+val modMenuVersion = providers.gradleProperty("mod_menu_version")
 
-val slf4jApiVersion: String by projectCamel
-val log4jVersion: String by projectCamel
-val guavaVersion: String by projectCamel
-val gsonVersion: String by projectCamel
-val commonsLang3Version: String by projectCamel
+val slf4jApiVersion = providers.gradleProperty("slf4j_api_version")
+val log4jVersion = providers.gradleProperty("log4j_version")
+val guavaVersion = providers.gradleProperty("guava_version")
+val gsonVersion = providers.gradleProperty("gson_version")
+val commonsLang3Version = providers.gradleProperty("commons_lang3_version")
 
-val javaVersion: Int by projectCamel
+val javaVersion = providers.gradleProperty("java_version")
+
+group = modGroup.get()
+base.archivesName = modName.get()
+version = modVersion.get()
 
 loom {
     noIntermediateMappings()
-    customMinecraftMetadata.set("https://downloads.betterthanadventure.net/bta-client/${btaChannel}/v${btaVersion}/manifest.json")
+    customMinecraftMetadata.set("https://downloads.betterthanadventure.net/bta-client/${btaChannel.get()}/v${btaVersion.get()}/manifest.json")
 }
 
 repositories {
@@ -68,11 +55,11 @@ repositories {
         patternLayout { artifact("[organisation]/releases/download/v[revision]/[module].jar") }
         metadataSources { artifact() }
     }
-    ivy("https://downloads.betterthanadventure.net/bta-client/${btaChannel}/") {
+    ivy("https://downloads.betterthanadventure.net/bta-client/${btaChannel.get()}/") {
         patternLayout { artifact("/v[revision]/client.jar") }
         metadataSources { artifact() }
     }
-    ivy("https://downloads.betterthanadventure.net/bta-server/${btaChannel}/") {
+    ivy("https://downloads.betterthanadventure.net/bta-server/${btaChannel.get()}/") {
         patternLayout { artifact("/v[revision]/server.jar") }
         metadataSources { artifact() }
     }
@@ -83,37 +70,37 @@ repositories {
 }
 
 dependencies {
-    minecraft("::${btaVersion}")
+    minecraft("::${btaVersion.get()}")
     mappings(loom.layered {})
 
 	// https://piston-data.mojang.com/v1/objects/43db9b498cb67058d2e12d394e6507722e71bb45/client.jar
     modRuntimeOnly("objects:client:43db9b498cb67058d2e12d394e6507722e71bb45")
     // If you do not need Halplibe you can comment out or delete this line.
-    modImplementation("turniplabs:halplibe:${halplibeVersion}")
-	modImplementation("turniplabs:modmenu-bta:${modMenuVersion}")
-	modImplementation("net.fabricmc:fabric-loader:${loaderVersion}")
-	modImplementation("com.github.Better-than-Adventure:legacy-lwjgl3:${legacyLwjglVersion}")
+    modImplementation("turniplabs:halplibe:${halplibeVersion.get()}")
+	modImplementation("turniplabs:modmenu-bta:${modMenuVersion.get()}")
+	modImplementation("net.fabricmc:fabric-loader:${loaderVersion.get()}")
+	modImplementation("com.github.Better-than-Adventure:legacy-lwjgl3:${legacyLwjglVersion.get()}")
 
-	implementation(platform("org.lwjgl:lwjgl-bom:${lwjglVersion}"))
-	implementation("org.slf4j:slf4j-api:${slf4jApiVersion}")
+	implementation(platform("org.lwjgl:lwjgl-bom:${lwjglVersion.get()}"))
+	implementation("org.slf4j:slf4j-api:${slf4jApiVersion.get()}")
 
-	implementation("com.google.guava:guava:${guavaVersion}")
-	implementation("com.google.code.gson:gson:${gsonVersion}")
+	implementation("com.google.guava:guava:${guavaVersion.get()}")
+	implementation("com.google.code.gson:gson:${gsonVersion.get()}")
 
-	implementation("org.apache.logging.log4j:log4j-slf4j2-impl:${log4jVersion}")
-	implementation("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-	implementation("org.apache.logging.log4j:log4j-api:${log4jVersion}")
-	implementation("org.apache.logging.log4j:log4j-1.2-api:${log4jVersion}")
+	implementation("org.apache.logging.log4j:log4j-slf4j2-impl:${log4jVersion.get()}")
+	implementation("org.apache.logging.log4j:log4j-core:${log4jVersion.get()}")
+	implementation("org.apache.logging.log4j:log4j-api:${log4jVersion.get()}")
+	implementation("org.apache.logging.log4j:log4j-1.2-api:${log4jVersion.get()}")
 
-	implementation("org.apache.commons:commons-lang3:${commonsLang3Version}")
-	include("org.apache.commons:commons-lang3:${commonsLang3Version}")
+	implementation("org.apache.commons:commons-lang3:${commonsLang3Version.get()}")
+	include("org.apache.commons:commons-lang3:${commonsLang3Version.get()}")
 
-	implementation("org.lwjgl:lwjgl:${lwjglVersion}")
-	implementation("org.lwjgl:lwjgl-assimp:${lwjglVersion}")
-	implementation("org.lwjgl:lwjgl-glfw:${lwjglVersion}")
-	implementation("org.lwjgl:lwjgl-openal:${lwjglVersion}")
-	implementation("org.lwjgl:lwjgl-opengl:${lwjglVersion}")
-	implementation("org.lwjgl:lwjgl-stb:${lwjglVersion}")
+	implementation("org.lwjgl:lwjgl:${lwjglVersion.get()}")
+	implementation("org.lwjgl:lwjgl-assimp:${lwjglVersion.get()}")
+	implementation("org.lwjgl:lwjgl-glfw:${lwjglVersion.get()}")
+	implementation("org.lwjgl:lwjgl-openal:${lwjglVersion.get()}")
+	implementation("org.lwjgl:lwjgl-opengl:${lwjglVersion.get()}")
+	implementation("org.lwjgl:lwjgl-stb:${lwjglVersion.get()}")
 
 	runtimeOnly("org.lwjgl:lwjgl::$lwjglNatives")
 	runtimeOnly("org.lwjgl:lwjgl-assimp::$lwjglNatives")
@@ -126,9 +113,9 @@ dependencies {
 tasks {
 	withType<JavaCompile>().configureEach {
 		options.encoding = "UTF-8"
-		sourceCompatibility = javaVersion.toString()
-		targetCompatibility = javaVersion.toString()
-		if (javaVersion > 8) options.release = javaVersion
+		sourceCompatibility = javaVersion.get()
+		targetCompatibility = javaVersion.get()
+		if (javaVersion.get().toInt() > 8) options.release = javaVersion.get().toInt()
 	}
 	withType<JavaExec>().configureEach { defaultCharacterEncoding = "UTF-8" }
 	withType<Javadoc>().configureEach { options.encoding = "UTF-8" }
@@ -152,36 +139,41 @@ tasks {
 		}
 		licenseFile?.let {
 			from(it) {
-				rename { original -> "${original}_${archiveBaseName}" }
+				rename { original -> "${original}_${archiveBaseName.get()}" }
 			}
 		}
 	}
 	processResources {
-		inputs.property("modVersion", version)
-		inputs.property("loaderVersion", loaderVersion)
-		inputs.property("javaVersion", javaVersion)
-		inputs.property("HalplibeVersion", halplibeVersion)
-		inputs.property("modMenuVersion", modMenuVersion)
+		val stringModVersion = modVersion.get()
+		val stringLoaderVersion = loaderVersion.get()
+		val stringJavaVersion = javaVersion.get()
+		val stringHalplibeVersion = halplibeVersion.get()
+		val stringModMenuVersion = modMenuVersion.get()
+		inputs.property("modVersion", stringModVersion)
+		inputs.property("loaderVersion", stringLoaderVersion)
+		inputs.property("javaVersion", stringJavaVersion)
+		inputs.property("HalplibeVersion", stringHalplibeVersion)
+		inputs.property("modMenuVersion", stringModMenuVersion)
 		filesMatching("fabric.mod.json") {
 			expand(
 				mapOf(
-					"version" to version,
-					"fabricloader" to loaderVersion,
-					"halplibe" to halplibeVersion,
-					"java" to javaVersion,
-					"modmenu" to modMenuVersion
+					"version" to stringModVersion,
+					"fabricloader" to stringLoaderVersion,
+					"halplibe" to stringHalplibeVersion,
+					"java" to stringJavaVersion,
+					"modmenu" to stringModMenuVersion
 				)
 			)
 		}
-		filesMatching("**/*.mixins.json") { expand(mapOf("java" to javaVersion)) }
+		filesMatching("**/*.mixins.json") { expand(mapOf("java" to stringJavaVersion)) }
 	}
 	java {
 		toolchain {
-			languageVersion = JavaLanguageVersion.of(javaVersion)
+			languageVersion = JavaLanguageVersion.of(javaVersion.get())
 			vendor = JvmVendorSpec.ADOPTIUM
 		}
-		sourceCompatibility = JavaVersion.toVersion(javaVersion)
-		targetCompatibility = JavaVersion.toVersion(javaVersion)
+		sourceCompatibility = JavaVersion.toVersion(javaVersion.get().toInt())
+		targetCompatibility = JavaVersion.toVersion(javaVersion.get().toInt())
 		withSourcesJar()
 	}
 }
