@@ -4,6 +4,7 @@ import com.github.olypolyu.betterwands.gui.screens.wand.mobpicker.entry.options.
 import net.minecraft.core.entity.EntityDispatcher;
 import net.minecraft.core.entity.Mob;
 import net.minecraft.core.lang.I18n;
+import net.minecraft.core.world.World;
 import org.jspecify.annotations.Nullable;
 
 import java.util.*;
@@ -52,6 +53,12 @@ public class MobPickerEntry {
 		return classMobPickerEntryMap.getOrDefault(mobClass, null);
 	}
 
+	static public @Nullable MobPickerEntry getEntryFor(String mobID) {
+		return classMobPickerEntryMap.getOrDefault(
+			EntityDispatcher.stringIdToClassMap.get(mobID), null
+		);
+	}
+
 	static public boolean isInitialized(Class<? extends Mob> mobClass) {
 		return classMobPickerEntryMap.containsKey(mobClass);
 	}
@@ -64,5 +71,14 @@ public class MobPickerEntry {
 
 	public List<MobPickerOption<?>> getOptions() {
 		return new ArrayList<>(this.options);
+	}
+
+	public Mob makeMob() {
+		try {
+			return this.mobClass.getConstructor(World.class).newInstance((Object) null);
+		}
+		catch (Exception ignored) {}
+
+		return null;
 	}
 }

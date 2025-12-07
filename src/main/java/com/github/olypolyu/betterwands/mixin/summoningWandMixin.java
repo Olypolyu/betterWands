@@ -1,6 +1,6 @@
 package com.github.olypolyu.betterwands.mixin;
 
-import com.github.olypolyu.betterwands.gui.screens.wand.mobpicker.ScreenMobPicker;
+import com.github.olypolyu.betterwands.gui.screens.wand.mobpicker.MobPickerScreen;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
@@ -17,6 +17,6 @@ public class summoningWandMixin {
 
 	@WrapMethod(method = "displayWandMobPickerScreen")
 	public void displayWandMobPickerScreen(ItemStack itemStack, Operation<Void> original) {
-		mc.displayScreen(new ScreenMobPicker(itemStack));
+		mc.displayScreen(new MobPickerScreen(itemStack));
 	}
 }
